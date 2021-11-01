@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run server\" \"npm run retailers\"",
+    "retailers": "npm start --prefix retailers",
+    "consumers": "npm start --prefix consumers",
+    "server": "nodemon server/server.js"
   },
   "repository": {
     "type": "git",
@@ -17,8 +21,18 @@
   },
   "homepage": "https://github.com/chepurisunil3/Rect-with-Node#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "concurrently": "^6.3.0",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "mongoose": "^5.13.5"
+    "express-formidable": "^1.2.0",
+    "express-validator": "^6.12.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.5",
+    "multer": "^1.4.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }
