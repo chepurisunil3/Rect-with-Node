@@ -3,6 +3,7 @@ const RetailersSchema = require("../../models/retailers/retailers");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
 const { getToken } = require("../../utils/jwt-token");
+const redisClient = require("../../utils/redis-connection");
 const saltRounds = Number(process.env.saltRounds);
 dotenv.config();
 const secretKey = process.env.tokenSecretKey;
@@ -25,10 +26,10 @@ const addUser = async (req, res, next) => {
     await retailersSchema.save();
     delete retailersSchema.password;
     const token = await getToken(retailersSchema._id, retailersSchema.email);
+    res.cookie("auth", token);
     res.json({
       success: true,
       data: retailersSchema.getUserReadableData(),
-      token,
     });
   } catch (e) {
     console.log(e);
@@ -58,7 +59,8 @@ const checkLogin = async (req, res, next) => {
       );
       if (isPasswordCorrect) {
         const token = await getToken(user._id, user.email);
-        res.json({ data: user.getUserReadableData(), success: true, token });
+        res.cookie("auth", token);
+        res.json({ data: user.getUserReadableData(), success: true });
       } else {
         res.json({
           success: false,
@@ -83,11 +85,22 @@ const checkLogin = async (req, res, next) => {
 };
 const getUserDetails = async (req, res, next) => {
   try {
-    const user = await RetailersSchema.findById(req.user.id);
+    const user = await redisClient.get(req.user.id.toString());
     if (user) {
       res.status(200).json({ success: true, data: user.getUserReadableData() });
     } else {
-      res.status(202).json({ success: false, message: "User not found!" });
+      user = await RetailersSchema.findById(req.user.id);
+      if (user) {
+        await redisClient.set(
+          req.user.id.toString(),
+          JSON.stringify(user.getUserReadableData())
+        );
+        res
+          .status(200)
+          .json({ success: true, data: user.getUserReadableData() });
+      } else {
+        res.status(202).json({ success: false, message: "User not found!" });
+      }
     }
   } catch (error) {
     console.log(error);

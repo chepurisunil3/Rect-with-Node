@@ -4,6 +4,7 @@ const ProductsValidator = (method) => {
     case "ADD_CATEGORY":
       return [body("categoryName").notEmpty()];
     case "DELETE_CATEGORY":
+    case "GET_CATEGORY":
       return [param("id").notEmpty()];
     default:
       return [];

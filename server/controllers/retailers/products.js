@@ -45,6 +45,19 @@ const getCategories = async (req, res, next) => {
   }
 };
 
+const getCategory = async (req, res, next) => {
+  try {
+    const category = await CategoriesSchema.findById(req.params.id);
+    res.json({
+      success: true,
+      data: category ? category.getUserReadableData() : null,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error });
+  }
+};
+
 const deleteCategory = async (req, res, next) => {
   try {
     await CategoriesSchema.findByIdAndDelete(req.params.id);
@@ -53,4 +66,4 @@ const deleteCategory = async (req, res, next) => {
     res.json({ success: false, id: req.params.id });
   }
 };
-module.exports = { addCategory, getCategories, deleteCategory };
+module.exports = { addCategory, getCategories, deleteCategory, getCategory };

@@ -5,6 +5,8 @@ const connectToMongoDB = require("../config/mongo-connection");
 const app = express();
 const retailersRouter = require("./routes/retailers");
 const productsRouter = require("./routes/products");
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 const PORT = process.env.PORT;
 const cors = require("cors");
 const allowedOrigins = ["http://localhost:3000", "http://localhost:3001"];
